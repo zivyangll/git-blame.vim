@@ -47,7 +47,7 @@ conflicts with other plugins you may have installed.** This can easily be
 changed by rebinding the leader in your vimrc:
 
 ```vim
-map <Leader>s :<C-u>call gitblame#echo()<CR>
+nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
 ```
 
 Quick start guide
