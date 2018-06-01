@@ -45,7 +45,14 @@ function! gitblame#commit_summary(file, line)
         return ''
     endif
 
-    let summary = matchstr(git_blame[0], '^summary \zs.\+$')
+    let summary = ''
+    for line in git_blame
+        if line =~# '^summary '
+            let summary = matchstr(line, '^summary \zs.\+$')
+            break
+        endif
+    endfor
+
     let author = matchstr(git_blame[1], 'author \zs.\+$')
     let author_mail = matchstr(git_blame[2], 'author-mail \zs.\+$')
     let blank = ' '
