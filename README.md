@@ -13,6 +13,12 @@ git-blame.vim
 
 See Git Blame information in the status bar for the currently selected line.
 
+![](https://wx3.sinaimg.cn/large/bceaad1fly1frwfmv58g4j21kw0ingph.jpg)
+
+![](https://wx3.sinaimg.cn/large/bceaad1fly1frwfmv539mj21kw0inq7e.jpg)
+
+![](https://wx2.sinaimg.cn/large/bceaad1fly1frwfmv50ytj21kw0in42a.jpg)
+
 Installation
 --------------
 
@@ -61,6 +67,11 @@ Self-Promotion
 Like git-blame.vim? Follow the repository on
 [GitHub](https://github.com/zivyangll/git-blame.vim).  And if
 you're feeling especially charitable, follow [GitHub](https://github.com/zivyangll).
+
+Thanks
+--------------
+
+[git-messenger.vim](https://github.com/rhysd/git-messenger.vim)
 
 License
 -------
