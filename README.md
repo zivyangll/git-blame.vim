@@ -65,7 +65,7 @@ Self-Promotion
 --------------
 
 Like git-blame.vim? Follow the repository on
-[GitHub](https://github.com/zivyangll/git-blame.vim).  And if
+[GitHub](https://github.com/zivyangll/git-blame.vim) and vote for it on [vim.org](https://www.vim.org/scripts/script.php?script_id=5704). And if
 you're feeling especially charitable, follow [GitHub](https://github.com/zivyangll).
 
 Thanks
