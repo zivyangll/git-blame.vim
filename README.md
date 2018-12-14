@@ -45,12 +45,10 @@ Using [Vundle](https://github.com/VundleVim/Vundle.vim)
 Plugin 'zivyangll/git-blame.vim'
 ```
 
-Default bindings
+Please setting bindings
 -----------------
 
-**The default leader has been changed to `<Leader>s` to avoid
-conflicts with other plugins you may have installed.** This can easily be
-changed by rebinding the leader in your vimrc:
+** You must push the map in your vimrc to avoid conflicts with other plugins you may have installed.: **
 
 ```vim
 nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
