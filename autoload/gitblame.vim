@@ -55,11 +55,11 @@ function! gitblame#commit_summary(file, line)
 
     let author = matchstr(git_blame[1], 'author \zs.\+$')
     let author_mail = matchstr(git_blame[2], 'author-mail \zs.\+$')
-    let timeformat = ' "+%Y-%m-%d %H:%M:%S"'
-    let timestamp = split(s:system('date -r ' .matchstr(git_blame[3], 'author-time \zs.\+$') .timeformat), "\n")[0]
+    let timestamp = matchstr(git_blame[3], 'author-time \zs.\+$')
+    let author_time = strftime("%Y-%m-%d %X", timestamp)
     let blank = ' '
 
-    return '['.commit_hash[0:8].'] '.summary .blank .author_mail .blank .author .blank .'('.timestamp.')'
+    return '['.commit_hash[0:8].'] '.summary .blank .author_mail .blank .author .blank .'('.author_time.')'
 endfunction
 
 function! gitblame#echo()
