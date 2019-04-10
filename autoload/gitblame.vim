@@ -33,10 +33,12 @@ function! s:system(str, ...)
 endfunction
 
 function! gitblame#commit_summary(file, line)
-    let git_blame = split(s:system('git --no-pager blame '.a:file.' -L '.a:line.',+1 --porcelain'), "\n")
+    let git_blame = split(s:system('cd "$(dirname "'.a:file.'")"; git --no-pager blame "$(basename "'.a:file.'")" -L "$(basename "'.a:line.'")",+1 --porcelain'), "\n")
     let l:shell_error = s:has_vimproc() ? vimproc#get_last_status() : v:shell_error
-    if l:shell_error && git_blame[0] =~# '^fatal: Not a git repository'
+    if l:shell_error && ( git_blame[0] =~# '^fatal: Not a git repository' || git_blame[0] =~# '^fatal: cannot stat path' )
         return 'Error: Not a git repository'
+	elseif l:shell_error
+		return 'Unhandled error: '.git_blame[0]
     endif
 
     let commit_hash = matchstr( git_blame[0], '^\^*\zs\S\+' )
