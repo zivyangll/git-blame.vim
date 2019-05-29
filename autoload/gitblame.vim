@@ -36,15 +36,15 @@ function! gitblame#commit_summary(file, line)
     let git_blame = split(s:system('cd "$(dirname "'.a:file.'")"; git --no-pager blame "$(basename "'.a:file.'")" -L "$(basename "'.a:line.'")",+1 --porcelain'), "\n")
     let l:shell_error = s:has_vimproc() ? vimproc#get_last_status() : v:shell_error
     if l:shell_error && ( git_blame[0] =~# '^fatal: Not a git repository' || git_blame[0] =~# '^fatal: cannot stat path' )
-       return 'Error: Not a git repository'
+        return {'error': 'Not a git repository'}
     elseif l:shell_error
-       return 'Unhandled error: '.git_blame[0]
+        return {'error': 'Unhandled error: '.git_blame[0]}
     endif
 
     let commit_hash = matchstr( git_blame[0], '^\^*\zs\S\+' )
     if commit_hash =~# '^0\+$'
         " not committed yet
-        return ''
+        return {'error': 'Not Committed yet'}
     endif
 
     let summary = ''
@@ -59,15 +59,20 @@ function! gitblame#commit_summary(file, line)
     let author_mail = matchstr(git_blame[2], 'author-mail \zs.\+$')
     let timestamp = matchstr(git_blame[3], 'author-time \zs.\+$')
     let author_time = strftime("%Y-%m-%d %X", timestamp)
-    let blank = ' '
 
-    return '['.commit_hash[0:8].'] '.summary .blank .author_mail .blank .author .blank .'('.author_time.')'
+    return {'author':author, 'author_mail': author_mail, 'author_time': author_time, 'commit_hash': commit_hash, 'summary': summary, 'timestamp': timestamp }
 endfunction
 
 function! gitblame#echo()
-    let file = expand('%')
-    let line = line('.')
-    echo gitblame#commit_summary(file, line)
+    let l:blank = ' '
+    let l:file = expand('%')
+    let l:line = line('.')
+    let l:gb = gitblame#commit_summary(l:file, l:line)
+    if has_key(l:gb, 'error')
+        echo '['.l:gb['error'].']'
+    else
+        echo '['.l:gb['commit_hash'][0:8].'] '.l:gb['summary'] .l:blank .l:gb['author_mail'] .l:blank .l:gb['author'] .l:blank .'('.l:gb['author_time'].')'
+    endif
 endfunction
 
 let &cpo = s:save_cpo
