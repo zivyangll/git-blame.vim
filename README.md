@@ -59,6 +59,15 @@ Quick start guide
 
 just use `<leader>s`
 
+
+Publish git-blame
+-----------------
+```
+tar zcvf git-blame.tar.gz git-blame.vim
+```
+
+upload: https://www.vim.org/scripts/script.php?script_id=5704
+
 Self-Promotion
 --------------
 
