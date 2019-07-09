@@ -2,7 +2,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 if has('nvim-0.3.2')
-    let s:ns = nvim_create_namespace('gitBlame')
+    let b:GBlameVirtualTextCounter = 0
     let g:GBlameVirtualTextEnable = get(g:, 'GBlameVirtualTextEnable', 0)
     let g:GBlameVirtualTextPrefix = get(g:, 'GBlameVirtualTextPrefix', '> ')
     let g:GBlameVirtualTextDelay  = get(g:, 'GBlameVirtualTextDelay', 2000)
@@ -83,10 +83,12 @@ function! gitblame#echo()
         let l:echoMsg = '['.l:gb['commit_hash'][0:8].'] '.l:gb['summary'] .l:blank .l:gb['author_mail'] .l:blank .l:gb['author'] .l:blank .'('.l:gb['author_time'].')'
     endif
     if (g:GBlameVirtualTextEnable)
+       let l:ns = nvim_create_namespace('gitBlame'.b:GBlameVirtualTextCounter)
+       let b:GBlameVirtualTextCounter = (b:GBlameVirtualTextCounter + 1)%50
        let l:line = line('.')
        let l:buffer = bufnr('')
-       call nvim_buf_set_virtual_text(l:buffer, s:ns, l:line-1, [[g:GBlameVirtualTextPrefix.l:echoMsg, 'GBlameMSG']], {})
-       call timer_start(g:GBlameVirtualTextDelay, { tid -> nvim_buf_clear_namespace(l:buffer, s:ns, 0, -1)})
+       call nvim_buf_set_virtual_text(l:buffer, l:ns, l:line-1, [[g:GBlameVirtualTextPrefix.l:echoMsg, 'GBlameMSG']], {})
+       call timer_start(g:GBlameVirtualTextDelay, { tid -> nvim_buf_clear_namespace(l:buffer, l:ns, 0, -1)})
     endif
     echo l:echoMsg
 endfunction
