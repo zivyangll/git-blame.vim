@@ -69,7 +69,7 @@ function! gitblame#commit_summary(file, line)
     let timestamp = matchstr(git_blame[3], 'author-time \zs.\+$')
     let author_time = strftime("%Y-%m-%d %X", timestamp)
 
-    return {'author':author, 'author_mail': author_mail, 'author_time': author_time, 'commit_hash': commit_hash, 'summary': summary, 'timestamp': timestamp }
+    return {'author':author, 'author_mail': author_mail, 'author_time': author_time, 'commit_hash': commit_hash, 'summary': summary }
 endfunction
 
 function! gitblame#echo()
