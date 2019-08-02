@@ -10,6 +10,10 @@ if has('nvim-0.3.2')
     let g:GBlameVirtualTextEnable = 0
  endif
 
+if has("patch-8.1.1522")
+    let g:GBlameUsePopup = get(g:, 'GBlameUsePopup', 1)
+endif
+
 function! s:has_vimproc()
   if !exists('s:exists_vimproc')
     try
@@ -50,26 +54,64 @@ function! gitblame#commit_summary(file, line)
         return {'error': 'Unhandled error: '.git_blame[0]}
     endif
 
-    let commit_hash = matchstr( git_blame[0], '^\^*\zs\S\+' )
-    if commit_hash =~# '^0\+$'
+    let content = {}
+    let content['commit_hash'] = matchstr( git_blame[0], '^\^*\zs\S\+' )
+    if content['commit_hash']=~# '^0\+$'
         " not committed yet
         return {'error': 'Not Committed yet'}
     endif
 
-    let summary = ''
+
     for line in git_blame
         if line =~# '^summary '
-            let summary = matchstr(line, '^summary \zs.\+$')
+            let content['summary'] = matchstr(line, '^summary \zs.\+$')
             break
         endif
     endfor
 
-    let author = matchstr(git_blame[1], 'author \zs.\+$')
-    let author_mail = matchstr(git_blame[2], 'author-mail \zs.\+$')
-    let timestamp = matchstr(git_blame[3], 'author-time \zs.\+$')
-    let author_time = strftime("%Y-%m-%d %X", timestamp)
+    let content['author'] = matchstr(git_blame[1], 'author \zs.\+$')
+    let content['author_mail'] = matchstr(git_blame[2], 'author-mail \zs.\+$')
+    let content['author_time'] = strftime("%Y-%m-%d %X", matchstr(git_blame[3], 'author-time \zs.\+$'))
 
-    return {'author':author, 'author_mail': author_mail, 'author_time': author_time, 'commit_hash': commit_hash, 'summary': summary, 'timestamp': timestamp }
+    if (g:GBlameUsePopup)
+	let content['committer'] = matchstr(git_blame[5], '^committer \zs.\+')
+	let content['committer_mail'] = matchstr(git_blame[6], '^committer-mail \zs\S\+')
+    endif
+
+    return content
+
+endfunction
+
+function! gitblame#vimpopup_summary(gb)
+
+    return [
+	  \ 'Commit: ' . a:gb['commit_hash'][0:8],
+	  \ 'Author: ' . a:gb['author'] . ' ' . a:gb['author_mail'],
+	  \ 'Date: ' . a:gb['author_time'],
+	  \ 'Committer: ' . a:gb['committer'] . ' ' . a:gb['committer_mail'],
+	  \ '',
+	  \ a:gb['summary'],
+	  \ ]
+
+endfunction
+
+function! gitblame#vimpopup(gb)
+
+    let l:content = has_key(a:gb, "error") ? a:gb['error'] : gitblame#vimpopup_summary(a:gb)
+    let l:winid = popup_create(l:content, {
+	  \ 'padding': [1,1,1,1],
+	  \ 'pos': 'botleft',
+	  \ 'line': 'cursor-1',
+	  \ 'col': 'cursor',
+	  \ 'minwidth': 20,
+	  \ 'maxwidth': 80,
+	  \ 'close': 'click',
+	  \ 'moved': 'WORD',
+	  \ 'drag:': 'TRUE',
+	  \ })
+
+    call win_execute(l:winid, "set syntax=gitblame")
+    
 endfunction
 
 function! gitblame#echo()
@@ -77,11 +119,18 @@ function! gitblame#echo()
     let l:file = expand('%')
     let l:line = line('.')
     let l:gb = gitblame#commit_summary(l:file, l:line)
+
+    " if vim has support for popup we will use it, unless stated otherwise
+    if (g:GBlameUsePopup)
+	return gitblame#vimpopup(l:gb)
+    endif
+
     if has_key(l:gb, 'error')
         let l:echoMsg = '['.l:gb['error'].']'
     else
-        let l:echoMsg = '['.l:gb['commit_hash'][0:8].'] '.l:gb['summary'] .l:blank .l:gb['author_mail'] .l:blank .l:gb['author'] .l:blank .'('.l:gb['author_time'].')'
+        let l:echoMsg = '[' . l:gb['commit_hash'][0:8]. '] ' . l:gb['summary'] .l:blank .l:gb['author_mail'] .l:blank .l:gb['author'] .l:blank .'('.l:gb['author_time'].')'
     endif
+
     if (g:GBlameVirtualTextEnable)
        let l:ns = nvim_create_namespace('gitBlame'.b:GBlameVirtualTextCounter)
        let b:GBlameVirtualTextCounter = (b:GBlameVirtualTextCounter + 1)%50
@@ -90,6 +139,7 @@ function! gitblame#echo()
        call nvim_buf_set_virtual_text(l:buffer, l:ns, l:line-1, [[g:GBlameVirtualTextPrefix.l:echoMsg, 'GBlameMSG']], {})
        call timer_start(g:GBlameVirtualTextDelay, { tid -> nvim_buf_clear_namespace(l:buffer, l:ns, 0, -1)})
     endif
+
     echo l:echoMsg
 endfunction
 
