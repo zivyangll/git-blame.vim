@@ -81,6 +81,10 @@ function! gitblame#echo()
         let l:echoMsg = '['.l:gb['error'].']'
     else
         let l:echoMsg = '['.l:gb['commit_hash'][0:8].'] '.l:gb['summary'] .l:blank .l:gb['author_mail'] .l:blank .l:gb['author'] .l:blank .'('.l:gb['author_time'].')'
+	let excess = strwidth(l:echoMsg) - winwidth(0)
+	if excess > 0
+	    let l:echoMsg = '['.l:gb['commit_hash'][0:8].'] '.l:gb['summary'][:strwidth(l:gb['summary'])-excess-5] .'...' .l:blank .l:gb['author_mail'] .l:blank .l:gb['author'] .l:blank .'('.l:gb['author_time'].')'
+	endif
     endif
     if (g:GBlameVirtualTextEnable)
        let l:ns = nvim_create_namespace('gitBlame'.b:GBlameVirtualTextCounter)
