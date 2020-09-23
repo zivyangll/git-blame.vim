@@ -45,7 +45,7 @@ Using [Vundle](https://github.com/VundleVim/Vundle.vim)
 Plugin 'zivyangll/git-blame.vim'
 ```
 
-Please setting bindings
+Manual binding
 -----------------
 
 ** You must push the map in your vimrc to avoid conflicts with other plugins you may have installed.: **
@@ -53,6 +53,17 @@ Please setting bindings
 ```vim
 nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
 ```
+
+Auto git blame on current line
+-----------------
+
+Taking the cue from [@Edo78](https://github.com/Edo78)'s [comment](https://github.com/zivyangll/git-blame.vim/issues/20#issuecomment-534526591), add the following to your `~/.vimrc`:
+
+```vim
+autocmd CursorHold * :call gitblame#echo()
+```
+
+This will display the git blame after the cursor is held momentarily.
 
 Quick start guide
 -----------------
