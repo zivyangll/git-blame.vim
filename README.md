@@ -19,6 +19,11 @@ See Git Blame information in the status bar for the currently selected line.
 
 ![](https://wx2.sinaimg.cn/large/bceaad1fly1frwfmv50ytj21kw0in42a.jpg)
 
+Additional Feature
+------------------
+
+This fork has the trim message length in the status line, mainly for users who use 1 line height to avoid git commit message > 1 line height and gets prompted to PRESS ENTER TO CONTINUE.
+
 Installation
 --------------
 
@@ -36,13 +41,13 @@ then simply copy and paste:
 Using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'zivyangll/git-blame.vim'
+Plug 'wotzhs/git-blame.vim'
 ```
 
 Using [Vundle](https://github.com/VundleVim/Vundle.vim)
 
 ```viml
-Plugin 'zivyangll/git-blame.vim'
+Plugin 'wotzhs/git-blame.vim'
 ```
 
 Manual binding
