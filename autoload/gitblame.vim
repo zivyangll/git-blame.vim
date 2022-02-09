@@ -41,8 +41,8 @@ function! s:system(str, ...)
   return output
 endfunction
 
-function! gitblame#commit_summary(file, line)
-    let git_blame = split(s:system('cd "$(dirname "'.a:file.'")"; git --no-pager blame "$(basename "'.a:file.'")" -L "$(basename "'.a:line.'")",+1 --porcelain'), "\n")
+function! gitblame#commit_summary(file_dir, file_name, line)
+    let git_blame = split(s:system('cd "'.a:file_dir.'"; git --no-pager blame "'.a:file_name.'" -L "$(basename "'.a:line.'")",+1 --porcelain'), "\n")
     let l:shell_error = s:has_vimproc() ? vimproc#get_last_status() : v:shell_error
     if l:shell_error && ( git_blame[0] =~# '^fatal: Not a git repository' || git_blame[0] =~# '^fatal: cannot stat path' )
         return {'error': 'Not a git repository'}
@@ -75,8 +75,10 @@ endfunction
 function! gitblame#echo()
     let l:blank = ' '
     let l:file = expand('%')
+    let l:file_dir = s:system('dirname "'.l:file.'" | xargs -i echo -n "{}"')
+    let l:file_name = s:system('readlink -n "'.l:file.'" || basename "'.l:file.'" | xargs -i echo -n "{}"')
     let l:line = line('.')
-    let l:gb = gitblame#commit_summary(l:file, l:line)
+    let l:gb = gitblame#commit_summary(l:file_dir, l:file_name, l:line)
     if has_key(l:gb, 'error')
         let l:echoMsg = '['.l:gb['error'].']'
     else
